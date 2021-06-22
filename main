@@ -1,0 +1,158 @@
+-- Example made by twink marie
+repeat wait() until game:IsLoaded()
+local Material = loadstring(game:HttpGet("https://raw.githubusercontent.com/Kinlei/MaterialLua/master/Module.lua"))()
+
+local url = nil
+local dont = false
+local name = game.Players.LocalPlayer.Name
+local logging = false
+
+local X = Material.Load({
+    Title = "webhook ui",
+    Style = 1,
+    SizeX = 500,
+    SizeY = 350,
+    Theme = "Aqua",
+   ColorOverrides = {
+        MainFrame = Color3.fromRGB(0,0,128),
+        Button = Color3.fromRGB(0,0,255),
+        TitleBar = Color3.fromRGB(77,77,255),
+        NavBar = Color3.fromRGB(0,0,255),
+    }
+})
+
+local options = X.New({
+    Title = "options"
+})
+local chatlogstuff = X.New({
+    Title = "chat log"
+})
+
+local H = options.TextField({
+    Text = "webhook",
+    Callback = function(Value)
+        url = Value
+    end,
+    Menu = {
+    }
+})
+
+local asdas1 = options.Button({
+    Text = "save url",
+    Callback = function()
+writefile("savedurl.txt",url)
+    end
+})
+
+local asdas = chatlogstuff.Button({
+    Text = "start logging",
+    Callback = function()
+        logging = true
+    end
+})
+local asdas2 = chatlogstuff.Button({
+    Text = "stop logging",
+    Callback = function()
+        logging = false
+    end
+})
+
+pcall(function()
+        url = url or readfile("savedurl.txt")
+        end)
+       local http_request = http_request;
+if syn then
+    http_request = syn.request
+elseif SENTINEL_V2 then
+    function http_request(tb)
+        return {
+            StatusCode = 200;
+            Body = request(tb.Url, tb.Method, (tb.Body or ''))
+        }
+    end
+end
+local market = game:GetService("MarketplaceService")
+local info = market:GetProductInfo(game.PlaceId, Enum.InfoType.Asset)
+
+local HttpServ = game:GetService('HttpService')
+local data = 
+    {
+        ["content"] = "Game Loaded: "..info.Name,
+    }
+    local newdata = HttpServ:JSONEncode(data)
+    
+    local headers = {
+            ["content-type"] = "application/json"
+    }
+    
+    local request_payload = {Url=url, Body=newdata, Method="POST", Headers=headers}
+    http_request(request_payload)
+for i,v in pairs(game.Players:GetPlayers()) do
+    v.Chatted:connect(function(msg)
+        if logging == true then
+local data = 
+    {
+        ["content"] = v.Name..": "..msg,
+    }
+    local newdata = HttpServ:JSONEncode(data)
+    
+    local headers = {
+            ["content-type"] = "application/json"
+    }
+    
+    local request_payload = {Url=url, Body=newdata, Method="POST", Headers=headers}
+    http_request(request_payload)
+    end
+end)
+end
+game.Players.PlayerAdded:connect(function(player)
+    if logging == true then
+    local data = 
+    {
+        ["content"] = player.Name.." joined.",
+    }
+    local newdata = HttpServ:JSONEncode(data)
+    
+    local headers = {
+            ["content-type"] = "application/json"
+    }
+    
+    local request_payload = {Url=url, Body=newdata, Method="POST", Headers=headers}
+    http_request(request_payload)
+    player.Chatted:connect(function(msg)
+        local data = 
+    {
+        ["content"] = player.Name..": "..msg,
+    }
+    local newdata = HttpServ:JSONEncode(data)
+    
+    local headers = {
+            ["content-type"] = "application/json"
+    }
+    
+    local request_payload = {Url=url, Body=newdata, Method="POST", Headers=headers}
+    http_request(request_payload)
+    end)
+    end
+end)
+game.Players.PlayerRemoving:connect(function(player)
+    if player.Name == name then
+        dont = true
+    end
+    if dont ~= true then
+            if logging == true then
+    local data = 
+    {
+        ["content"] = player.Name.." left.",
+    }
+    local newdata = HttpServ:JSONEncode(data)
+    
+    local headers = {
+            ["content-type"] = "application/json"
+    }
+    
+    local request_payload = {Url=url, Body=newdata, Method="POST", Headers=headers}
+    http_request(request_payload)
+    end
+    end
+end)
